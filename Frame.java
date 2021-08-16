@@ -101,6 +101,10 @@ public class Frame extends JFrame {
 
 	private void keygen() {
 		System.out.println("keygen");
+		if (checkKeyFile()) {
+			// TODO: check if key.pem exists, dialog to confirm new key
+		}
+		run("keygen");
 		checkKeyFile();
 	}
 
