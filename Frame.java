@@ -104,7 +104,7 @@ public class Frame extends JFrame {
 		if (checkKeyFile()) {
 			// TODO: check if key.pem exists, dialog to confirm new key
 		}
-		run("keygen");
+		run_verbose("keygen");
 		checkKeyFile();
 	}
 
@@ -191,13 +191,22 @@ public class Frame extends JFrame {
 		cmdline.add(teensy_secure_command);
 		cmdline.add(operation);
 		cmdline.add(keyfile.getAbsolutePath());
-		return run_program(cmdline);
+		return run_program(cmdline, false);
 	}
 
-	private String run_program(List<String> cmdline) {
+	private String run_verbose(String operation) {
+		List<String> cmdline = new LinkedList<String>();
+		cmdline.add(teensy_secure_command);
+		cmdline.add(operation);
+		cmdline.add(keyfile.getAbsolutePath());
+		return run_program(cmdline, true);
+	}
+
+	private String run_program(List<String> cmdline, boolean verbose) {
 		try {
 			ProcessBuilder pb = new ProcessBuilder(cmdline);
-			pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+			//pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+			pb.redirectErrorStream(true);
 			Process program = pb.start();
 			InputStreamReader in = new InputStreamReader(program.getInputStream());
 			StringBuilder output = new StringBuilder();
@@ -205,7 +214,12 @@ public class Frame extends JFrame {
 			while (true) {
 				int n = in.read(buffer, 0, 16384);
 				if (n < 0) break;
-				if (n > 0) output.append(buffer, 0, n);
+				if (n > 0) {
+					if (verbose) {
+						System.out.print(new String(buffer, 0, n));
+					}
+					output.append(buffer, 0, n);
+				}
 			}
 			int ret = program.waitFor();
 			if (ret == 0) return output.toString(); // success, stdout as String
