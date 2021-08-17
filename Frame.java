@@ -60,6 +60,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.JOptionPane;
 
 import processing.app.Theme;
 import processing.app.Base;
@@ -100,9 +101,26 @@ public class Frame extends JFrame {
 	}
 
 	private void keygen() {
-		System.out.println("keygen");
 		if (checkKeyFile()) {
-			// TODO: check if key.pem exists, dialog to confirm new key
+			Object[] options = {"Create Another Key", "Keep Using Same Key"};
+			int choice = JOptionPane.showOptionDialog(this,
+				"You already have a key!\n\n" +
+				"Normally a single key is used for code security,\n" +
+				"allowing your encrypted programs to run on any\n" +
+				"of your boards.  Multiple keys may be useful for\n" +
+				"different products, where the code for product A\n" +
+				"only runs on boards with key A and can't be run\n" +
+				"on another of your products which use a different\n" +
+				"key.  But managing multiple keys involves more\n" +
+				"logistical work.  A single key is much simpler!\n\n" +
+				"If you create another key, prior key files will\n" +
+				"be automatically renamed.",
+				"Duplicate Key Creation",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE,
+				null, options, options[1]);
+			System.out.println("choice=" + choice + ", Yes=" + JOptionPane.YES_OPTION);
+			if (choice != JOptionPane.YES_OPTION) return;
 		}
 		run_verbose("keygen");
 		checkKeyFile();
